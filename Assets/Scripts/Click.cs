@@ -1,17 +1,19 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class Click : MonoBehaviour
 {
+    public Button ClickButton;
     public int minAttack;
     public int maxAttack;
 
     string[] enemyName = { "Goblin", "Wolf", "Skeleton" };
-    int[] enemyHp = { 20, 30, 40 };
+    int[] enemyHp = { 50, 75, 100 };
     string currentEnemy;
-    int currentEnemyHp = -1;
+    int currentEnemyHp = 0;
 
     int repeatEnemy = 0;
     int randEnemy = 0;
@@ -20,9 +22,10 @@ public class Click : MonoBehaviour
     public float FillSpeed = 0.5f;
     private float hpProgress = 1;
     float hp = 0;
+
     void Start()
     {
-        
+        RandEnemy();
     }
 
     void Update()
@@ -34,21 +37,23 @@ public class Click : MonoBehaviour
     public void AttackClick()
     {
         
-        if (currentEnemyHp <= 0)
+        if (currentEnemyHp <= 0 && slider.value <= 0)
         {
             RandEnemy();
-            hp = currentEnemyHp;
+            Debug.Log("work");
         }
+        else
+        {
+            int r = Random.Range(minAttack, maxAttack);
 
-        int r = Random.Range(minAttack, maxAttack);
+            currentEnemyHp -= r;
 
-        currentEnemyHp -= r;
- 
-        IncrementHpProgress(currentEnemyHp/hp);
+            IncrementHpProgress(currentEnemyHp / hp);
 
-        Debug.Log(r);
-        Debug.Log(currentEnemy);
-        Debug.Log(currentEnemyHp);
+            //Debug.Log(r);
+            Debug.Log(currentEnemy);
+            Debug.Log(currentEnemyHp);
+        }
     }
 
     public void RandEnemy()
@@ -60,16 +65,20 @@ public class Click : MonoBehaviour
 
         currentEnemy = enemyName[randEnemy];
         currentEnemyHp = enemyHp[randEnemy];
+
+        hp = currentEnemyHp;
+
+        hpProgress = 1;
+        slider.value = 1;
+    }
+
+    public void DieEnemy()
+    {
+
     }
 
     public void IncrementHpProgress(float newProgress)
     {
         hpProgress = newProgress;
-
-        if (hpProgress <= 0)
-        {
-            hpProgress = 1;
-            slider.value = 1;
-        }
     }
 }

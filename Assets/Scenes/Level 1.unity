@@ -166,7 +166,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3c27377a38f907543826a87b4a0aa06c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minAttack: 0
+  ClickButton: {fileID: 1588249170}
+  minAttack: 10
   maxAttack: 10
   slider: {fileID: 1330312114}
   FillSpeed: 0.5
