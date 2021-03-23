@@ -1,1 +1,1 @@
-# Herakles - Unity 2020.3.0f1
+# Heracles - Unity 2020.3.0f1
