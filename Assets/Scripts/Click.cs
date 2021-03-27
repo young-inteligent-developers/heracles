@@ -12,26 +12,30 @@ public class Click : MonoBehaviour
     public int minAttack;
     public int maxAttack;
 
-    string[] enemyName = { "Goblin", "Wolf", "Skeleton" };
+    [Header("HP Slider")]
+    public GameObject HPslider;
+    public Slider slider;
+    public float FillSpeed = 0.5f;
+    private float hpProgress = 1;
+    private float hp = 0;
+    private bool attack = true;
+
+    [Header("Attack Text Points")]
+    public GameObject GeneratePointsCointener;
+    public GameObject AttackPointText;
+    public GameObject AttackPointBlocker;
+
+    [Header("Enemy")]
+    public SpriteRenderer EnemySprite;
+    public Sprite[] enemyNameString = new Sprite[3];
+
+    string[] enemyName = { "Ninja", "Elf", "Lumberjack" };
     int[] enemyHp = { 50, 75, 100 };
     string currentEnemy;
     int currentEnemyHp = 0;
 
     int repeatEnemy = 0;
     int randEnemy = 0;
-
-    [Header("HP Slider")]
-    public GameObject HPslider;
-    public Slider slider;
-    public float FillSpeed = 0.5f;
-    private float hpProgress = 1;
-    float hp = 0;
-    bool attack = true;
-
-    [Header("Attack Text Points")]
-    public GameObject GeneratePointsCointener;
-    public GameObject AttackPointText;
-    public GameObject AttackPointBlocker;
 
     void Start()
     {
@@ -47,6 +51,8 @@ public class Click : MonoBehaviour
 
         if (currentEnemyHp <= 0 && slider.value <= 0 && attack == true)
             AttackClick();
+
+        DelatePoint();
     }
 
     public void AttackClick()
@@ -73,8 +79,10 @@ public class Click : MonoBehaviour
 
     public void RandEnemy()
     {
+
         HPslider.SetActive(true);
         ClickButton.enabled = true;
+        EnemySprite.enabled = true;
         attack = true;
 
         while (randEnemy == repeatEnemy)
@@ -89,12 +97,16 @@ public class Click : MonoBehaviour
 
         hpProgress = 1;
         slider.value = 1;
+
+
+        EnemySprite.sprite = enemyNameString[randEnemy];
     }
 
     public void DieEnemy()
     {
         HPslider.SetActive(false);
         ClickButton.enabled = false;
+        EnemySprite.enabled = false;
         attack = false;
 
         Debug.Log("Die");
@@ -110,5 +122,20 @@ public class Click : MonoBehaviour
     public void IncrementHpProgress(float newProgress)
     {
         hpProgress = newProgress;
+    }
+
+    void DelatePoint()
+    {
+
+        //Debug.Log(col);
+        //Debug.Log(AttackPointBlocker.GetComponent<Collider2D>());
+
+        foreach (Transform child in GeneratePointsCointener.GetComponent<Transform>())
+        {
+            if (child.GetComponent<Collider2D>().IsTouching(AttackPointBlocker.GetComponent<Collider2D>()))
+            {
+                Destroy(child.gameObject);
+            }
+        }   
     }
 }
