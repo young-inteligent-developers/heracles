@@ -15,6 +15,7 @@ public class Click : MonoBehaviour
     [Header("HP Slider")]
     public GameObject HPslider;
     public Slider slider;
+    public TextMeshProUGUI actuallyHP;
     public float FillSpeed = 0.5f;
     private float hpProgress = 1;
     private float hp = 0;
@@ -26,20 +27,35 @@ public class Click : MonoBehaviour
     public GameObject AttackPointBlocker;
 
     [Header("Enemy")]
-    public SpriteRenderer EnemySprite;
-    public Sprite[] enemyNameString = new Sprite[3];
-
-    string[] enemyName = { "Ninja", "Elf", "Lumberjack" };
-    int[] enemyHp = { 50, 75, 100 };
-    string currentEnemy;
+    public GameObject Enemy;
+    public Sprite[] EnemyNameString = new Sprite[3];
+    int[] enemyHp = { 100, 125, 150 };
     int currentEnemyHp = 0;
-
     int repeatEnemy = 0;
     int randEnemy = 0;
+
+    [Header("Stage")]
+    public Button StagesButton;
+    public TextMeshProUGUI FightWithBoss;
+    public TextMeshProUGUI StageText;
+    int stage = 15;
+    int maxStage = 15;
+    int level = 0;
+
+    [Header("Boss")]
+    public Sprite[] Boss = new Sprite[1];
+    int[] BoosHp = { 500 };
+    bool boss = false;
+    void Awake()
+    {
+       
+    }
 
     void Start()
     {
         RandEnemy();
+        ActuallyHP();
+        ActuallyStage();
 
         //slider = HPslider.GetComponent<Slider>();
     }
@@ -57,79 +73,132 @@ public class Click : MonoBehaviour
 
     public void AttackClick()
     {
+
         if (currentEnemyHp <= 0 && slider.value <= 0)
         {
             DieEnemy();
             Invoke("RandEnemy", 1);
         }
-        else
+        else if (currentEnemyHp >= 0)
         {
             int r = Random.Range(minAttack, maxAttack);
 
             currentEnemyHp -= r;
+            ActuallyHP();
 
             IncrementHpProgress(currentEnemyHp / hp);
             ShowRandAttackEnemy(r);
 
             //Debug.Log(r);
-            Debug.Log("Enemy : " + currentEnemy);
             Debug.Log("Actualy HP : " + currentEnemyHp);
+            Debug.Log("Actualy Lvl : " + level);
         }
     }
 
-    public void RandEnemy()
+    void RandEnemy()
     {
-
-        HPslider.SetActive(true);
+        //HPslider.SetActive(true);
+        Enemy.SetActive(true);
         ClickButton.enabled = true;
-        EnemySprite.enabled = true;
         attack = true;
 
         while (randEnemy == repeatEnemy)
-            randEnemy = Random.Range(0, enemyName.Length);
+            randEnemy = Random.Range(0, EnemyNameString.Length);
 
         repeatEnemy = randEnemy;
 
-        currentEnemy = enemyName[randEnemy];
+        //currentEnemy = enemyNameString[randEnemy];
         currentEnemyHp = enemyHp[randEnemy];
 
         hp = currentEnemyHp;
+        ActuallyHP();
 
         hpProgress = 1;
         slider.value = 1;
 
 
-        EnemySprite.sprite = enemyNameString[randEnemy];
+        Enemy.GetComponent<SpriteRenderer>().sprite = EnemyNameString[randEnemy];
     }
 
-    public void DieEnemy()
+    void DieEnemy()
     {
-        HPslider.SetActive(false);
+        //HPslider.SetActive(false);
+        Enemy.SetActive(false);
         ClickButton.enabled = false;
-        EnemySprite.enabled = false;
         attack = false;
+
+        stage++;
+        ActuallyStage();
 
         Debug.Log("Die");
     }
 
-    public void ShowRandAttackEnemy(int r)
+    void ShowRandAttackEnemy(int r)
     {
         GameObject att = Instantiate(AttackPointText, GeneratePointsCointener.transform);
 
         att.GetComponent<TextMeshProUGUI>().text = r.ToString();
+
     }
 
-    public void IncrementHpProgress(float newProgress)
+    void IncrementHpProgress(float newProgress)
     {
         hpProgress = newProgress;
     }
 
+    void ActuallyHP()
+    {
+        if(currentEnemyHp > 0)
+            actuallyHP.text = currentEnemyHp.ToString() + " HP";
+        else
+            actuallyHP.text = "Dead";
+    }
+
+    void ActuallyStage()
+    {
+        if (stage == maxStage)
+        {
+            FightWithBoss.enabled = true;
+            StageText.enabled = false;
+            StagesButton.enabled = true;
+
+            boss = true;
+        }
+        else if (stage > maxStage && boss == false)
+        {
+            FightWithBoss.enabled = false;
+            StageText.enabled = true;
+            StagesButton.enabled = false;
+
+            //level++;
+            stage = 0;
+        }
+
+        StageText.text = stage.ToString() + "/" + maxStage.ToString();
+    }
+
+    public void FightBoss()
+    {
+        FightWithBoss.enabled = false;
+        boss = false;
+
+        currentEnemyHp = BoosHp[level];
+
+        hp = currentEnemyHp;
+        ActuallyHP();
+
+        hpProgress = 1;
+        slider.value = 1;
+
+        Enemy.GetComponent<SpriteRenderer>().sprite = Boss[level];
+
+        ActuallyStage();
+
+        Debug.Log("Boss");
+    }
+
     void DelatePoint()
     {
-
-        //Debug.Log(col);
-        //Debug.Log(AttackPointBlocker.GetComponent<Collider2D>());
-
         foreach (Transform child in GeneratePointsCointener.GetComponent<Transform>())
         {
             if (child.GetComponent<Collider2D>().IsTouching(AttackPointBlocker.GetComponent<Collider2D>()))
