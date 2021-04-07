@@ -13,7 +13,6 @@ public class Click : MonoBehaviour
     public int maxAttack;
 
     [Header("HP Slider")]
-    public GameObject HPslider;
     public Slider slider;
     public TextMeshProUGUI actuallyHP;
     public float FillSpeed = 0.5f;
@@ -38,14 +37,20 @@ public class Click : MonoBehaviour
     public Button StagesButton;
     public TextMeshProUGUI FightWithBoss;
     public TextMeshProUGUI StageText;
-    int stage = 15;
+    int stage = 14;
     int maxStage = 15;
     int level = 0;
+
+    [Header("Gold")]
+    public int gold;
+    public TextMeshProUGUI GoldText;
 
     [Header("Boss")]
     public Sprite[] Boss = new Sprite[1];
     int[] BoosHp = { 500 };
     bool boss = false;
+
+
     void Awake()
     {
        
@@ -56,8 +61,7 @@ public class Click : MonoBehaviour
         RandEnemy();
         ActuallyHP();
         ActuallyStage();
-
-        //slider = HPslider.GetComponent<Slider>();
+        ActuallyGold();
     }
 
     void Update()
@@ -97,7 +101,6 @@ public class Click : MonoBehaviour
 
     void RandEnemy()
     {
-        //HPslider.SetActive(true);
         Enemy.SetActive(true);
         ClickButton.enabled = true;
         attack = true;
@@ -122,13 +125,15 @@ public class Click : MonoBehaviour
 
     void DieEnemy()
     {
-        //HPslider.SetActive(false);
         Enemy.SetActive(false);
         ClickButton.enabled = false;
         attack = false;
 
         stage++;
         ActuallyStage();
+
+        gold += 10;
+        ActuallyGold();
 
         Debug.Log("Die");
     }
@@ -170,16 +175,22 @@ public class Click : MonoBehaviour
             StageText.enabled = true;
             StagesButton.enabled = false;
 
-            //level++;
             stage = 0;
+            gold += 40;
+            //level++;
         }
 
         StageText.text = stage.ToString() + "/" + maxStage.ToString();
     }
 
+    void ActuallyGold()
+    {
+        GoldText.text = gold.ToString();
+    }
+
     public void FightBoss()
     {
-        FightWithBoss.enabled = false;
+        //FightWithBoss.enabled = false;
         boss = false;
 
         currentEnemyHp = BoosHp[level];
@@ -191,8 +202,6 @@ public class Click : MonoBehaviour
         slider.value = 1;
 
         Enemy.GetComponent<SpriteRenderer>().sprite = Boss[level];
-
-        ActuallyStage();
 
         Debug.Log("Boss");
     }
