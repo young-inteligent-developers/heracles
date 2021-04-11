@@ -16,22 +16,14 @@ public class Click : MonoBehaviour
     public Slider slider;
     public TextMeshProUGUI actuallyHP;
     public float FillSpeed = 0.5f;
-    private float hpProgress = 1;
-    private float hp = 0;
-    private bool attack = true;
+    float hpProgress = 1;
+    float hp = 0;
+    bool attack = true;
 
     [Header("Attack Text Points")]
     public GameObject GeneratePointsCointener;
     public GameObject AttackPointText;
     public GameObject AttackPointBlocker;
-
-    [Header("Enemy")]
-    public GameObject Enemy;
-    public Sprite[] EnemyNameString = new Sprite[3];
-    int[] enemyHp = { 100, 125, 150 };
-    int currentEnemyHp = 0;
-    int repeatEnemy = 0;
-    int randEnemy = 0;
 
     [Header("Stage")]
     public Button StagesButton;
@@ -45,11 +37,18 @@ public class Click : MonoBehaviour
     public int gold;
     public TextMeshProUGUI GoldText;
 
-    [Header("Boss")]
-    public Sprite[] Boss = new Sprite[1];
-    int[] BoosHp = { 500 };
-    bool boss = false;
+    [Header("Enemy")]
+    public GameObject Enemy;
+    public Sprite[] EnemyNameSprite = new Sprite[3];
+    public int[] enemyHp = new int[3];
+    int currentEnemyHp = 0;
+    int repeatEnemy = 0;
+    int randEnemy = 0;
 
+    [Header("Boss")]
+    public Sprite[] BossSprite = new Sprite[1];
+    public int[] BoosHp = new int[1];
+    bool boss = false;
 
     void Awake()
     {
@@ -106,7 +105,7 @@ public class Click : MonoBehaviour
         attack = true;
 
         while (randEnemy == repeatEnemy)
-            randEnemy = Random.Range(0, EnemyNameString.Length);
+            randEnemy = Random.Range(0, EnemyNameSprite.Length);
 
         repeatEnemy = randEnemy;
 
@@ -120,7 +119,7 @@ public class Click : MonoBehaviour
         slider.value = 1;
 
 
-        Enemy.GetComponent<SpriteRenderer>().sprite = EnemyNameString[randEnemy];
+        Enemy.GetComponent<SpriteRenderer>().sprite = EnemyNameSprite[randEnemy];
     }
 
     void DieEnemy()
@@ -128,6 +127,8 @@ public class Click : MonoBehaviour
         Enemy.SetActive(false);
         ClickButton.enabled = false;
         attack = false;
+
+        //Enemy.GetComponent<Animator>().enabled = true; // Die Animation
 
         stage++;
         ActuallyStage();
@@ -201,7 +202,7 @@ public class Click : MonoBehaviour
         hpProgress = 1;
         slider.value = 1;
 
-        Enemy.GetComponent<SpriteRenderer>().sprite = Boss[level];
+        Enemy.GetComponent<SpriteRenderer>().sprite = BossSprite[level];
 
         Debug.Log("Boss");
     }
