@@ -28,26 +28,25 @@ public class Click : MonoBehaviour
     [Header("Stage")]
     public Button StagesButton;
     public TextMeshProUGUI FightWithBoss;
+    public Animator FightWithBossAnimation;
     public TextMeshProUGUI StageText;
-    int stage = 14;
+    public int stage = 14; // Public is test, change to private later
     int maxStage = 15;
-    int level = 0;
 
     [Header("Gold")]
-    public int gold;
     public TextMeshProUGUI GoldText;
 
-    [Header("Enemy")]
-    public GameObject Enemy;
-    public Sprite[] EnemyNameSprite = new Sprite[3];
-    public int[] enemyHp = new int[3];
+    [Header("Enemys")]
+    public GameObject EnemySprite;
+    public Sprite[] EnemiesSprites = new Sprite[3];
+    public int[] EnemiesHp = new int[3];
     int currentEnemyHp = 0;
     int repeatEnemy = 0;
     int randEnemy = 0;
 
-    [Header("Boss")]
-    public Sprite[] BossSprite = new Sprite[1];
-    public int[] BoosHp = new int[1];
+    [Header("Bosses")]
+    public Sprite[] BossesSprites = new Sprite[1];
+    public int[] BossesHp = new int[1];
     bool boss = false;
 
     void Awake()
@@ -60,7 +59,6 @@ public class Click : MonoBehaviour
         RandEnemy();
         ActuallyHP();
         ActuallyStage();
-        ActuallyGold();
     }
 
     void Update()
@@ -72,6 +70,7 @@ public class Click : MonoBehaviour
             AttackClick();
 
         DelatePoint();
+        ActuallyGold();
     }
 
     public void AttackClick()
@@ -94,23 +93,23 @@ public class Click : MonoBehaviour
 
             //Debug.Log(r);
             Debug.Log("Actualy HP : " + currentEnemyHp);
-            Debug.Log("Actualy Lvl : " + level);
+            Debug.Log("Actualy Lvl : " + GameManager.instance.level);
         }
     }
 
     void RandEnemy()
     {
-        Enemy.SetActive(true);
+        EnemySprite.SetActive(true);
         ClickButton.enabled = true;
         attack = true;
 
         while (randEnemy == repeatEnemy)
-            randEnemy = Random.Range(0, EnemyNameSprite.Length);
+            randEnemy = Random.Range(0, EnemiesSprites.Length);
 
         repeatEnemy = randEnemy;
 
         //currentEnemy = enemyNameString[randEnemy];
-        currentEnemyHp = enemyHp[randEnemy];
+        currentEnemyHp = EnemiesHp[randEnemy];
 
         hp = currentEnemyHp;
         ActuallyHP();
@@ -119,12 +118,12 @@ public class Click : MonoBehaviour
         slider.value = 1;
 
 
-        Enemy.GetComponent<SpriteRenderer>().sprite = EnemyNameSprite[randEnemy];
+        EnemySprite.GetComponent<SpriteRenderer>().sprite = EnemiesSprites[randEnemy];
     }
 
     void DieEnemy()
     {
-        Enemy.SetActive(false);
+        EnemySprite.SetActive(false);
         ClickButton.enabled = false;
         attack = false;
 
@@ -133,8 +132,7 @@ public class Click : MonoBehaviour
         stage++;
         ActuallyStage();
 
-        gold += 10;
-        ActuallyGold();
+        GameManager.instance.gold += 10;
 
         Debug.Log("Die");
     }
@@ -144,7 +142,6 @@ public class Click : MonoBehaviour
         GameObject att = Instantiate(AttackPointText, GeneratePointsCointener.transform);
 
         att.GetComponent<TextMeshProUGUI>().text = r.ToString();
-
     }
 
     void IncrementHpProgress(float newProgress)
@@ -176,9 +173,11 @@ public class Click : MonoBehaviour
             StageText.enabled = true;
             StagesButton.enabled = false;
 
+            FightWithBossAnimation.enabled = true;
+
             stage = 0;
-            gold += 40;
-            //level++;
+            GameManager.instance.gold += 40;
+            //GameManager.instance.level++;       
         }
 
         StageText.text = stage.ToString() + "/" + maxStage.ToString();
@@ -186,7 +185,7 @@ public class Click : MonoBehaviour
 
     void ActuallyGold()
     {
-        GoldText.text = gold.ToString();
+        GoldText.text = GameManager.instance.gold.ToString();
     }
 
     public void FightBoss()
@@ -194,7 +193,10 @@ public class Click : MonoBehaviour
         //FightWithBoss.enabled = false;
         boss = false;
 
-        currentEnemyHp = BoosHp[level];
+        FightWithBossAnimation.enabled = false;
+        FightWithBoss.fontSize = 90;
+
+        currentEnemyHp = BossesHp[GameManager.instance.level];
 
         hp = currentEnemyHp;
         ActuallyHP();
@@ -202,7 +204,7 @@ public class Click : MonoBehaviour
         hpProgress = 1;
         slider.value = 1;
 
-        Enemy.GetComponent<SpriteRenderer>().sprite = BossSprite[level];
+        EnemySprite.GetComponent<SpriteRenderer>().sprite = BossesSprites[GameManager.instance.level];
 
         Debug.Log("Boss");
     }
