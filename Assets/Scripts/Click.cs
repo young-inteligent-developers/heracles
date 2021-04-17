@@ -37,8 +37,9 @@ public class Click : MonoBehaviour
     public TextMeshProUGUI GoldText;
 
     [Header("Enemys")]
-    public GameObject EnemySprite;
-    public Sprite[] EnemiesSprites = new Sprite[3];
+    public GameObject EnemyObject;
+    public string[] EnemiesNames = new string[3];
+    //public Sprite[] EnemiesSprites = new Sprite[3];
     public int[] EnemiesHp = new int[3];
     int currentEnemyHp = 0;
     int repeatEnemy = 0;
@@ -83,6 +84,8 @@ public class Click : MonoBehaviour
         }
         else if (currentEnemyHp >= 0)
         {
+            EnemyObject.GetComponent<Animator>().SetTrigger("Attack");
+
             int r = Random.Range(minAttack, maxAttack);
 
             currentEnemyHp -= r;
@@ -95,18 +98,24 @@ public class Click : MonoBehaviour
             Debug.Log("Actualy HP : " + currentEnemyHp);
             Debug.Log("Actualy Lvl : " + GameManager.instance.level);
         }
+        
     }
 
     void RandEnemy()
     {
-        EnemySprite.SetActive(true);
+        EnemyObject.SetActive(true);
         ClickButton.enabled = true;
         attack = true;
 
+        for (int i = 0; i < EnemiesNames.Length; i++)
+            EnemyObject.GetComponent<Animator>().SetBool(EnemiesNames[i], false);
+
         while (randEnemy == repeatEnemy)
-            randEnemy = Random.Range(0, EnemiesSprites.Length);
+            randEnemy = Random.Range(0, EnemiesNames.Length);
 
         repeatEnemy = randEnemy;
+
+        EnemyObject.GetComponent<Animator>().SetBool(EnemiesNames[randEnemy], true);
 
         //currentEnemy = enemyNameString[randEnemy];
         currentEnemyHp = EnemiesHp[randEnemy];
@@ -118,12 +127,12 @@ public class Click : MonoBehaviour
         slider.value = 1;
 
 
-        EnemySprite.GetComponent<SpriteRenderer>().sprite = EnemiesSprites[randEnemy];
+        //EnemyObject.GetComponent<SpriteRenderer>().sprite = EnemiesSprites[randEnemy];
     }
 
     void DieEnemy()
     {
-        EnemySprite.SetActive(false);
+        EnemyObject.SetActive(false);
         ClickButton.enabled = false;
         attack = false;
 
@@ -204,7 +213,7 @@ public class Click : MonoBehaviour
         hpProgress = 1;
         slider.value = 1;
 
-        EnemySprite.GetComponent<SpriteRenderer>().sprite = BossesSprites[GameManager.instance.level];
+        EnemyObject.GetComponent<SpriteRenderer>().sprite = BossesSprites[GameManager.instance.level];
 
         Debug.Log("Boss");
     }
