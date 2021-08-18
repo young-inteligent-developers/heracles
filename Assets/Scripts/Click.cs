@@ -8,46 +8,46 @@ public class Click : MonoBehaviour
 {
 
     [Header("Attack Configuration Points")]
-    public Button ClickButton;
+    public Button clickButton;
     public int minAttack;
     public int maxAttack;
 
     [Header("HP Slider")]
     public Slider slider;
     public TextMeshProUGUI actuallyHP;
-    public float FillSpeed = 0.5f;
+    float fillSpeed = 0.5f;
     float hpProgress = 1;
     float hp = 0;
     bool attack = true;
 
     [Header("Attack Text Points")]
-    public GameObject GeneratePointsCointener;
-    public GameObject AttackPointText;
-    public GameObject AttackPointBlocker;
+    public GameObject generatePointsCointener;
+    public GameObject attackPointText;
+    public GameObject attackPointBlocker;
 
     [Header("Stage")]
-    public Button StagesButton;
-    public TextMeshProUGUI FightWithBoss;
-    public Animator FightWithBossAnimation;
-    public TextMeshProUGUI StageText;
+    public Button stagesButton;
+    public TextMeshProUGUI fightWithBoss;
+    public Animator fightWithBossAnimation;
+    public TextMeshProUGUI stageText;
     public int stage = 14; // Public is test, change to private later
     int maxStage = 15;
 
     [Header("Gold")]
-    public TextMeshProUGUI GoldText;
+    public TextMeshProUGUI goldText;
 
     [Header("Enemys")]
-    public GameObject EnemyObject;
-    public string[] EnemiesNames = new string[3];
-    //public Sprite[] EnemiesSprites = new Sprite[3];
-    public int[] EnemiesHp = new int[3];
+    public GameObject enemyObject;
+    public string[] enemiesNames = new string[3];
+    //public Sprite[,] enemiesSprites = new Sprite[3, 3];
+    public int[] enemiesHp = new int[3];
     int currentEnemyHp = 0;
     int repeatEnemy = 0;
     int randEnemy = 0;
 
     [Header("Bosses")]
-    public Sprite[] BossesSprites = new Sprite[1];
-    public int[] BossesHp = new int[1];
+    public Sprite[] bossesSprites = new Sprite[1];
+    public int[] bossesHp = new int[1];
     bool boss = false;
 
     void Awake()
@@ -65,7 +65,7 @@ public class Click : MonoBehaviour
     void Update()
     {
         if (slider.value > hpProgress)
-            slider.value -= FillSpeed * Time.deltaTime;
+            slider.value -= fillSpeed * Time.deltaTime;
 
         if (currentEnemyHp <= 0 && slider.value <= 0 && attack == true)
             AttackClick();
@@ -84,7 +84,7 @@ public class Click : MonoBehaviour
         }
         else if (currentEnemyHp >= 0)
         {
-            EnemyObject.GetComponent<Animator>().SetTrigger("Attack");
+            enemyObject.GetComponent<Animator>().SetTrigger("Attack");
 
             int r = Random.Range(minAttack, maxAttack);
 
@@ -103,22 +103,24 @@ public class Click : MonoBehaviour
 
     void RandEnemy()
     {
-        EnemyObject.SetActive(true);
-        ClickButton.enabled = true;
+        enemyObject.SetActive(true);
+        clickButton.enabled = true;
         attack = true;
 
-        for (int i = 0; i < EnemiesNames.Length; i++)
-            EnemyObject.GetComponent<Animator>().SetBool(EnemiesNames[i], false);
+        for (int i = 0; i < enemiesNames.Length; i++)
+            enemyObject.GetComponent<Animator>().SetBool(enemiesNames[i], false);
 
         while (randEnemy == repeatEnemy)
-            randEnemy = Random.Range(0, EnemiesNames.Length);
+            randEnemy = Random.Range(0, enemiesNames.Length);
 
         repeatEnemy = randEnemy;
 
-        EnemyObject.GetComponent<Animator>().SetBool(EnemiesNames[randEnemy], true);
+        enemyObject.GetComponent<Animator>().SetBool(enemiesNames[randEnemy], true);
+
+        Debug.Log("Enemy: " + enemiesNames[randEnemy]);
 
         //currentEnemy = enemyNameString[randEnemy];
-        currentEnemyHp = EnemiesHp[randEnemy];
+        currentEnemyHp = enemiesHp[randEnemy];
 
         hp = currentEnemyHp;
         ActuallyHP();
@@ -127,16 +129,16 @@ public class Click : MonoBehaviour
         slider.value = 1;
 
 
-        //EnemyObject.GetComponent<SpriteRenderer>().sprite = EnemiesSprites[randEnemy];
+        //enemyObject.GetComponent<SpriteRenderer>().sprite = enemiesSprites[randEnemy];
     }
 
     void DieEnemy()
     {
-        EnemyObject.SetActive(false);
-        ClickButton.enabled = false;
-        attack = false;
+        enemyObject.GetComponent<Animator>().Play("Die Animation");
 
-        //Enemy.GetComponent<Animator>().enabled = true; // Die Animation
+        //enemyObject.SetActive(false);
+        clickButton.enabled = false;
+        attack = false;
 
         stage++;
         ActuallyStage();
@@ -148,7 +150,7 @@ public class Click : MonoBehaviour
 
     void ShowRandAttackEnemy(int r)
     {
-        GameObject att = Instantiate(AttackPointText, GeneratePointsCointener.transform);
+        GameObject att = Instantiate(attackPointText, generatePointsCointener.transform);
 
         att.GetComponent<TextMeshProUGUI>().text = r.ToString();
     }
@@ -170,31 +172,31 @@ public class Click : MonoBehaviour
     {
         if (stage == maxStage)
         {
-            FightWithBoss.enabled = true;
-            StageText.enabled = false;
-            StagesButton.enabled = true;
+            fightWithBoss.enabled = true;
+            stageText.enabled = false;
+            stagesButton.enabled = true;
 
             boss = true;
         }
         else if (stage > maxStage && boss == false)
         {
-            FightWithBoss.enabled = false;
-            StageText.enabled = true;
-            StagesButton.enabled = false;
+            fightWithBoss.enabled = false;
+            stageText.enabled = true;
+            stagesButton.enabled = false;
 
-            FightWithBossAnimation.enabled = true;
+            fightWithBossAnimation.enabled = true;
 
             stage = 0;
             GameManager.instance.gold += 40;
             //GameManager.instance.level++;       
         }
 
-        StageText.text = stage.ToString() + "/" + maxStage.ToString();
+        stageText.text = stage.ToString() + "/" + maxStage.ToString();
     }
 
     void ActuallyGold()
     {
-        GoldText.text = GameManager.instance.gold.ToString();
+        goldText.text = GameManager.instance.gold.ToString();
     }
 
     public void FightBoss()
@@ -202,10 +204,10 @@ public class Click : MonoBehaviour
         //FightWithBoss.enabled = false;
         boss = false;
 
-        FightWithBossAnimation.enabled = false;
-        FightWithBoss.fontSize = 90;
+        fightWithBossAnimation.enabled = false;
+        fightWithBoss.fontSize = 90;
 
-        currentEnemyHp = BossesHp[GameManager.instance.level];
+        currentEnemyHp = bossesHp[GameManager.instance.level];
 
         hp = currentEnemyHp;
         ActuallyHP();
@@ -213,16 +215,16 @@ public class Click : MonoBehaviour
         hpProgress = 1;
         slider.value = 1;
 
-        EnemyObject.GetComponent<SpriteRenderer>().sprite = BossesSprites[GameManager.instance.level];
+        enemyObject.GetComponent<SpriteRenderer>().sprite = bossesSprites[GameManager.instance.level];
 
         Debug.Log("Boss");
     }
 
     void DelatePoint()
     {
-        foreach (Transform child in GeneratePointsCointener.GetComponent<Transform>())
+        foreach (Transform child in generatePointsCointener.GetComponent<Transform>())
         {
-            if (child.GetComponent<Collider2D>().IsTouching(AttackPointBlocker.GetComponent<Collider2D>()))
+            if (child.GetComponent<Collider2D>().IsTouching(attackPointBlocker.GetComponent<Collider2D>()))
             {
                 Destroy(child.gameObject);
             }
